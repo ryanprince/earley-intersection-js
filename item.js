@@ -1,8 +1,10 @@
 function item(production, intersectedStates) {
-  return {
+  const i = {
     production,
-    intersectedStates
+    intersectedStates,
   };
+  const hash = JSON.stringify(i);
+  return { ...i, hash };
 }
 
 module.exports = { item };

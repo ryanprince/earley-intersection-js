@@ -2,9 +2,9 @@ const { arc, fsa } = require("./fsa");
 const { production, cfg } = require("./cfg");
 const { intersect } = require("./earley-intersection");
 
-const black = Symbol("black");
-const dog = Symbol("dog");
-const the = Symbol("the");
+const black = "black";
+const dog = "dog";
+const the = "the";
 
 // The alphabet that the FSA and CFG will share.
 const sigma = new Set([black, dog, the]);
@@ -20,12 +20,12 @@ const myFsa = fsa(sigma, states, arcs, initialStates, acceptingStates);
 console.log(myFsa);
 
 // Constructing the CFG.
-const S = Symbol("S");
-const NP = Symbol("NP");
-const VP = Symbol("VP");
-const DT = Symbol("DT");
-const JJ = Symbol("JJ");
-const NN = Symbol("NN");
+const S = "S";
+const NP = "NP";
+const VP = "VP";
+const DT = "DT";
+const JJ = "JJ";
+const NN = "NN";
 
 const nonterminals = new Set([S, NP, VP, DT, JJ, NN]);
 const startNonterminal = S;
