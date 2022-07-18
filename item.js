@@ -26,11 +26,11 @@ function isCompletelyIntersected(i) {
 }
 
 function toProduction(i, cfg) {
-  const lhs = `${i.production.lhs}_${getFirstIntersectedState(i)}_${getLastIntersectedState(i)}`;
+  const lhs = `${i.production.lhs}_${getFirstIntersectedState(i)},${getLastIntersectedState(i)}`;
   const rhs = i.production.rhs.map(
     (symbol, index) => cfg.terminals.has(symbol)
       ? symbol
-      : `${symbol}_${i.intersectedStates[index]}_${i.intersectedStates[index + 1]}`
+      : `${symbol}_${i.intersectedStates[index]},${i.intersectedStates[index + 1]}`
   );
   return production(lhs, rhs);
 }
