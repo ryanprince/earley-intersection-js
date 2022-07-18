@@ -11,7 +11,7 @@ const sigma = new Set([black, dog, the]);
 
 // Constructing the FSA.
 const states = new Set([0, 1, 2, 3]);
-const arcs = new Set([arc(0, the, 1), arc(1, black, 2), arc(2, dog, 3)]);
+const arcs = new Set([arc(0, the, 1), arc(0, the, 2), arc(1, black, 2), arc(2, dog, 3)]);
 const initialStates = new Set([0]);
 const acceptingStates = new Set([3]);
 

@@ -1,3 +1,5 @@
+const { production } = require('./cfg');
+
 function item(production, intersectedStates) {
   const i = {
     production,
@@ -19,4 +21,18 @@ function getFirstIntersectedState(i) {
   return i.intersectedStates[0];
 }
 
-module.exports = { item, getNextUnprocessedSymbol, getLastIntersectedState, getFirstIntersectedState };
+function isCompletelyIntersected(i) {
+  return i.intersectedStates.length - 1 === i.production.rhs.length;
+}
+
+function toProduction(i, cfg) {
+  const lhs = `${i.production.lhs}_${getFirstIntersectedState(i)}_${getLastIntersectedState(i)}`;
+  const rhs = i.production.rhs.map(
+    (symbol, index) => cfg.terminals.has(symbol)
+      ? symbol
+      : `${symbol}_${i.intersectedStates[index]}_${i.intersectedStates[index + 1]}`
+  );
+  return production(lhs, rhs);
+}
+
+module.exports = { item, getNextUnprocessedSymbol, getLastIntersectedState, getFirstIntersectedState, isCompletelyIntersected, toProduction };

@@ -1,5 +1,5 @@
-const { production, cfg } = require("./cfg");
-const { item, getNextUnprocessedSymbol, getFirstIntersectedState, getLastIntersectedState } = require("./item");
+const { production, cfg: makeCfg } = require("./cfg");
+const { item, getNextUnprocessedSymbol, getFirstIntersectedState, getLastIntersectedState, isCompletelyIntersected, toProduction } = require("./item");
 
 function computeAxioms(fsa, cfg) {
   return [...fsa.initalStates]
@@ -87,11 +87,23 @@ function intersect(fsa, cfg) {
     passiveItems.push(activeItem);
   }
 
-  // Find the items that span from a start state to an end one.
+  // Find the completely intersected items.
+  const parseForest = passiveItems.filter(isCompletelyIntersected);
 
-  // Convert them to a new CFG.
+  // Prepare the parse forest as a new CFG.
+  const newStart = 'S';
+  const newStartProductions = parseForest
+    .filter((i) => i.production.lhs === cfg.startNonterminal)
+    .map((i) => production(newStart, toProduction(i, cfg).lhs));
+  const newProductions = [
+    ...newStartProductions,
+    ...parseForest.map((i) => toProduction(i, cfg))
+  ];
+  const newNonterminals = new Set(newProductions.map(({ lhs }) => lhs));
+  const intersectionCfg = makeCfg(cfg.terminals, newNonterminals, newStart, newProductions);
 
   // Return the new CFG.
+  return intersectionCfg;
 }
 
 module.exports = { intersect };
