@@ -1,5 +1,5 @@
 const { production, cfg } = require("./cfg");
-const { item } = require("./item");
+const { item, getNextUnprocessedSymbol, getFirstIntersectedState, getLastIntersectedState } = require("./item");
 
 function computeAxioms(fsa, cfg) {
   return [...fsa.initalStates]
@@ -7,6 +7,45 @@ function computeAxioms(fsa, cfg) {
       .filter(({ lhs }) => lhs === cfg.startNonterminal)
       .map((production) => item(production, [start]))
     ).flat();
+}
+
+function computePredictions(fromItem, cfg) {
+  const nextUnprocessedSymbol = getNextUnprocessedSymbol(fromItem);
+  const lastProcessedState = getLastIntersectedState(fromItem);
+  return cfg.productions
+    .filter(({ lhs }) => lhs === nextUnprocessedSymbol)
+    .filter(({ lhs }) => cfg.nonterminals.has(lhs))
+    .map((production) => item(production, [lastProcessedState]));
+}
+
+function computeSigmaScanResults(fromItem, fsa, cfg) {
+  const nextUnprocessedSymbol = getNextUnprocessedSymbol(fromItem);
+  const lastProcessedState = getLastIntersectedState(fromItem);
+  return !cfg.terminals.has(nextUnprocessedSymbol)
+    ? []
+    : [...fsa.arcs]
+      .filter(({ fromState, label }) => fromState === lastProcessedState && label === nextUnprocessedSymbol)
+      .map(({ toState }) => item(fromItem.production, [...fromItem.intersectedStates, toState]));
+}
+
+function computeCompletions(fromItem, cfg, activeItems, passiveItems) {
+  const var1 = cfg.terminals.has(getNextUnprocessedSymbol(fromItem))
+    ? []
+    : [...activeItems, ...passiveItems]
+      .filter((i) => i.production.lhs === getNextUnprocessedSymbol(fromItem)
+        && getFirstIntersectedState(i) === getLastIntersectedState(fromItem)
+        && getFirstIntersectedState(i) !== getLastIntersectedState(i)
+      )
+      .map((i) => item(fromItem.production, [...fromItem.intersectedStates, getLastIntersectedState(i)]));
+  const var2 = cfg.terminals.has(getNextUnprocessedSymbol(fromItem))
+    ? []
+    : [...activeItems, ...passiveItems]
+      .filter((i) => fromItem.production.lhs === getNextUnprocessedSymbol(i)
+        && getFirstIntersectedState(fromItem) === getLastIntersectedState(i)
+        && getFirstIntersectedState(fromItem) !== getLastIntersectedState(fromItem)
+      )
+      .map((i) => item(i.production, [...i.intersectedStates, getLastIntersectedState(fromItem)]));
+  return [...var1, ...var2];
 }
 
 function intersect(fsa, cfg) {
@@ -23,16 +62,16 @@ function intersect(fsa, cfg) {
     const activeItem = activeQueue.pop();
 
     // Each new item advances a single logical step from the active item.
-    const predictions = [];
-    const sigmaScanResults = [];
-    const epsilonScanResults = [];
-    const completions = [];
+    const predictions = computePredictions(activeItem, cfg);
+    const sigmaScanResults = computeSigmaScanResults(activeItem, fsa, cfg);
+    // const epsilonScanResults = [];
+    const completions = computeCompletions(activeItem, cfg, activeQueue, passiveItems);
 
     // Filter down to the generated items that we haven't seen before.
     const newItems = [
       ...predictions,
       ...sigmaScanResults,
-      ...epsilonScanResults,
+      // ...epsilonScanResults,
       ...completions
     ].filter(({ hash }) => !seen.has(hash));
 
