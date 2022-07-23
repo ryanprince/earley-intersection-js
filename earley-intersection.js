@@ -2,7 +2,7 @@ const { production, cfg: makeCfg } = require("./cfg");
 const { item, getNextUnprocessedSymbol, getFirstIntersectedState, getLastIntersectedState, isCompletelyIntersected, toProduction } = require("./item");
 
 function computeAxioms(fsa, cfg) {
-  return [...fsa.initalStates]
+  return [...fsa.initialStates]
     .map((start) => [...cfg.productions]
       .filter(({ lhs }) => lhs === cfg.startNonterminal)
       .map((production) => item(production, [start]))
