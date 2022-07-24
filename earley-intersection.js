@@ -40,7 +40,8 @@ function computeCompletions(fromItem, cfg, activeItems, passiveItems) {
   const var1 = cfg.terminals.has(getNextUnprocessedSymbol(fromItem))
     ? []
     : [...activeItems, ...passiveItems]
-      .filter((i) => i.production.lhs === getNextUnprocessedSymbol(fromItem)
+      .filter((i) => isCompletelyIntersected(i)
+        && i.production.lhs === getNextUnprocessedSymbol(fromItem)
         && getFirstIntersectedState(i) === getLastIntersectedState(fromItem)
         && getFirstIntersectedState(i) !== getLastIntersectedState(i)
       )
@@ -48,7 +49,8 @@ function computeCompletions(fromItem, cfg, activeItems, passiveItems) {
   const var2 = cfg.terminals.has(getNextUnprocessedSymbol(fromItem))
     ? []
     : [...activeItems, ...passiveItems]
-      .filter((i) => fromItem.production.lhs === getNextUnprocessedSymbol(i)
+      .filter((i) => isCompletelyIntersected(fromItem)
+        && fromItem.production.lhs === getNextUnprocessedSymbol(i)
         && getFirstIntersectedState(fromItem) === getLastIntersectedState(i)
         && getFirstIntersectedState(fromItem) !== getLastIntersectedState(fromItem)
       )
