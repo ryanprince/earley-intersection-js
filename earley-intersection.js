@@ -56,6 +56,21 @@ function computeCompletions(fromItem, cfg, activeItems, passiveItems) {
   return [...var1, ...var2];
 }
 
+function deDuplicate(productions) {
+  const seen = new Set();
+  const result = [];
+
+  productions.forEach((p) => {
+    const hash = JSON.stringify(p);
+    if (!seen.has(hash)) {
+      seen.add(hash);
+      result.push(p);
+    }
+  });
+
+  return result;
+}
+
 // Returns a list of the completely intersected items that span from an initial state to an
 // accepting state, along with all completely intersected items reachable from the rhs symbols
 // of those items; i.e., the completely intersected start items with the items that comprise
@@ -141,9 +156,11 @@ function intersect(fsa, cfg) {
 
   // Prepare the pruned parse forest as a new CFG.
   const newStart = 'S';
-  const newStartProductions = prunedParseForest
-    .filter((i) => i.production.lhs === cfg.startNonterminal)
-    .map((i) => production(newStart, toProduction(i, cfg).lhs));
+  const newStartProductions = deDuplicate(
+    prunedParseForest
+      .filter((i) => i.production.lhs === cfg.startNonterminal)
+      .map((i) => production(newStart, toProduction(i, cfg).lhs))
+  );
   const newProductions = [
     ...newStartProductions,
     ...prunedParseForest.map((i) => toProduction(i, cfg))
