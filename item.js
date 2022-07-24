@@ -25,6 +25,10 @@ function isCompletelyIntersected(i) {
   return i.intersectedStates.length - 1 === i.production.rhs.length;
 }
 
+function spansAcceptingPath(i, fsa) {
+  return fsa.initialStates.has(getFirstIntersectedState(i)) && fsa.acceptingStates.has(getLastIntersectedState(i));
+}
+
 function toProduction(i, cfg) {
   const lhs = `${i.production.lhs}_${getFirstIntersectedState(i)},${getLastIntersectedState(i)}`;
   const rhs = i.production.rhs.map(
@@ -35,4 +39,12 @@ function toProduction(i, cfg) {
   return production(lhs, rhs);
 }
 
-module.exports = { item, getNextUnprocessedSymbol, getLastIntersectedState, getFirstIntersectedState, isCompletelyIntersected, toProduction };
+module.exports = {
+  item,
+  getNextUnprocessedSymbol,
+  getLastIntersectedState,
+  getFirstIntersectedState,
+  isCompletelyIntersected,
+  spansAcceptingPath,
+  toProduction
+};

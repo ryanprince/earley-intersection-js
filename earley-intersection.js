@@ -1,5 +1,13 @@
 const { production, cfg: makeCfg } = require("./cfg");
-const { item, getNextUnprocessedSymbol, getFirstIntersectedState, getLastIntersectedState, isCompletelyIntersected, toProduction } = require("./item");
+const {
+  item,
+  getNextUnprocessedSymbol,
+  getFirstIntersectedState,
+  getLastIntersectedState,
+  isCompletelyIntersected,
+  spansAcceptingPath,
+  toProduction
+} = require("./item");
 
 function computeAxioms(fsa, cfg) {
   return [...fsa.initialStates]
@@ -48,6 +56,39 @@ function computeCompletions(fromItem, cfg, activeItems, passiveItems) {
   return [...var1, ...var2];
 }
 
+// Returns a list of the completely intersected items that span from an initial state to an
+// accepting state, along with all completely intersected items reachable from the rhs symbols
+// of those items; i.e., the completely intersected start items with the items that comprise
+// their sub-forest.
+function pruneParseForest(completelyIntersectedItems, fsa) {
+
+  // An index from each lhs nonterminal to a list of completely intersected items with that lhs.
+  const lhsIndex = completelyIntersectedItems.reduce((index, i) => ({
+    ...index,
+    [i.production.lhs]: index[i.production.lhs] ? [...index[i.production.lhs], i] : [i]
+  }), {});
+
+  const seen = new Set();
+  const prunedParseForest = [];
+
+  const gatherItemsFrom = (startItem) => {
+    if (seen.has(startItem.hash)) {
+      return;
+    }
+
+    seen.add(startItem.hash);
+    prunedParseForest.push(startItem);
+
+    const nextItems = startItem.production.rhs.map(lhs => lhsIndex[lhs]?.flat() ?? []).flat();
+    nextItems.forEach(gatherItemsFrom);
+  }
+
+  const initialItems = completelyIntersectedItems.filter((i) => spansAcceptingPath(i, fsa));
+  initialItems.forEach(gatherItemsFrom);
+
+  return prunedParseForest;
+}
+
 function intersect(fsa, cfg) {
   // Compute the initial items and add them to the queue.
   const axioms = computeAxioms(fsa, cfg);
@@ -86,7 +127,6 @@ function intersect(fsa, cfg) {
       }
     })
 
-
     // Once we've finished processing an item, we keep a record of it and it won't be
     // processed again. Items in here that span from a start state to an end comprise the
     // parse forest and will become productions in the output CFG.
@@ -96,14 +136,17 @@ function intersect(fsa, cfg) {
   // Find the completely intersected items.
   const parseForest = passiveItems.filter(isCompletelyIntersected);
 
-  // Prepare the parse forest as a new CFG.
+  // Prune to productions that lead to accepting states.
+  const prunedParseForest = pruneParseForest(parseForest, fsa);
+
+  // Prepare the pruned parse forest as a new CFG.
   const newStart = 'S';
-  const newStartProductions = parseForest
+  const newStartProductions = prunedParseForest
     .filter((i) => i.production.lhs === cfg.startNonterminal)
     .map((i) => production(newStart, toProduction(i, cfg).lhs));
   const newProductions = [
     ...newStartProductions,
-    ...parseForest.map((i) => toProduction(i, cfg))
+    ...prunedParseForest.map((i) => toProduction(i, cfg))
   ];
   const newNonterminals = new Set(newProductions.map(({ lhs }) => lhs));
   const intersectionCfg = makeCfg(cfg.terminals, newNonterminals, newStart, newProductions);
