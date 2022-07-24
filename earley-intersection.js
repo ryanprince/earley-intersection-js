@@ -67,19 +67,25 @@ function intersect(fsa, cfg) {
     // const epsilonScanResults = [];
     const completions = computeCompletions(activeItem, cfg, activeQueue, passiveItems);
 
-    // Filter down to the generated items that we haven't seen before.
     const newItems = [
       ...predictions,
       ...sigmaScanResults,
       // ...epsilonScanResults,
       ...completions
-    ].filter(({ hash }) => !seen.has(hash));
+    ];
 
-    // Track all new items in the seen set.
-    newItems.forEach(({ hash }) => seen.add(hash));
+    // Add new, unseen items to the queue.
+    newItems.forEach((i) => {
+      if (!seen.has(i.hash)) {
 
-    // Enqueue new items.
-    activeQueue.push(...newItems);
+        // Track all new items in the seen set.
+        seen.add(i.hash);
+
+        // Enqueue new items.
+        activeQueue.push(i);
+      }
+    })
+
 
     // Once we've finished processing an item, we keep a record of it and it won't be
     // processed again. Items in here that span from a start state to an end comprise the
