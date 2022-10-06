@@ -46,4 +46,4 @@ console.log(myCfg);
 
 const intersection = intersect(myFsa, myCfg);
 
-console.log(intersection);
+console.log(JSON.stringify(intersection, null, 2));
