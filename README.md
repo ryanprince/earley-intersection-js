@@ -9,7 +9,11 @@ A JavaScript implementation of Earley intersection, based on Doctor Wilker Aziz'
  - Following the notes, weight calculations aren't included.
 
 ## Example
-An example is included in `harmonization.js`. Constructs an FSA representing chord options according to a score's *vertical* constraints with a CFG representing a *horizontal* chord progression language. The output contains the following productions, where "S" is the start symbol.
+An example is included in `harmonization.js`. It works as follows.
+
+1. Defines a CFG representing a *horizontal* chord progression language.
+2. Constructs an FSA representing chord options according to some score's *vertical* note constraints. The example doesn't process an actual symbolic music score, but directly provides the resulting constraints as an FSA for illustration.
+3. Earley intersection is applied, and the output is a parse forest (CFG) containing the following productions, where "S" is the start symbol.
 
 ```
 [
