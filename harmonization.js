@@ -36,7 +36,6 @@ const productions = [
   production(SubdominantFunction, [Dm]),
   production(SubdominantFunction, [Am]),
   production(DominantFunction, [G]),
-  production(DominantFunction, [Em]),
   production(DominantFunction, [Bdim])
 ];
 
