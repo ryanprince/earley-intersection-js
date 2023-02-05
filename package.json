@@ -11,9 +11,9 @@
   "type": "module",
   "exports": {
     ".": {
-      "fsa": "./fsa.mjs",
-      "cfg": "./cfg.mjs",
-      "inersection": "./earley-intersection.mjs"
+      "fsa": "./lib/fsa.mjs",
+      "cfg": "./lib/cfg.mjs",
+      "inersection": "./lib/earley-intersection.mjs"
     }
   },
   "devDependencies": {
