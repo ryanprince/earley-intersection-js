@@ -1,4 +1,4 @@
-function arc(fromState, label, toState) {
+export function arc(fromState, label, toState) {
   return Object.freeze({
     fromState,
     label,
@@ -11,7 +11,7 @@ function arc(fromState, label, toState) {
 // arcs: the set of arcs.
 // initialStates: the subset of states that are entry points into the FSA.
 // acceptingStates: the subset of states that are accepting states for the FSA.
-function fsa(labels, states, arcs, initialStates, acceptingStates) {
+export function fsa(labels, states, arcs, initialStates, acceptingStates) {
   return Object.freeze({
     labels,
     states,
@@ -20,5 +20,3 @@ function fsa(labels, states, arcs, initialStates, acceptingStates) {
     acceptingStates
   });
 }
-
-module.exports = { arc, fsa };

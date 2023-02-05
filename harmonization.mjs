@@ -1,6 +1,6 @@
-const { arc, fsa } = require("./fsa");
-const { production, cfg } = require("./cfg");
-const { intersect } = require("./earley-intersection");
+import { arc, fsa } from './fsa.mjs';
+import { production, cfg } from './cfg.mjs';
+import { intersect } from './earley-intersection.mjs';
 
 const C = "C";
 const Dm = "Dm";

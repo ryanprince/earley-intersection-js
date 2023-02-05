@@ -1,5 +1,5 @@
-const { production, cfg: makeCfg } = require("./cfg");
-const {
+import { production, cfg as makeCfg } from './cfg.mjs';
+import {
   item,
   getNextUnprocessedSymbol,
   getFirstIntersectedState,
@@ -7,7 +7,7 @@ const {
   isCompletelyIntersected,
   spansAcceptingPath,
   toProduction
-} = require("./item");
+} from "./item.mjs";
 
 function computeAxioms(fsa, cfg) {
   return [...fsa.initialStates]
@@ -106,7 +106,7 @@ function pruneParseForest(completelyIntersectedItems, fsa) {
   return prunedParseForest;
 }
 
-function intersect(fsa, cfg) {
+export function intersect(fsa, cfg) {
   // Compute the initial items and add them to the queue.
   const axioms = computeAxioms(fsa, cfg);
 
@@ -173,5 +173,3 @@ function intersect(fsa, cfg) {
   // Return the new CFG.
   return intersectionCfg;
 }
-
-module.exports = { intersect };

@@ -1,6 +1,6 @@
-const { production } = require('./cfg');
+import { production } from './cfg.mjs';
 
-function item(production, intersectedStates) {
+export function item(production, intersectedStates) {
   const i = {
     production,
     intersectedStates,
@@ -9,27 +9,27 @@ function item(production, intersectedStates) {
   return { ...i, hash };
 }
 
-function getNextUnprocessedSymbol(i) {
+export function getNextUnprocessedSymbol(i) {
   return i.production.rhs[i.intersectedStates.length - 1];
 }
 
-function getLastIntersectedState(i) {
+export function getLastIntersectedState(i) {
   return i.intersectedStates[i.intersectedStates.length - 1];
 }
 
-function getFirstIntersectedState(i) {
+export function getFirstIntersectedState(i) {
   return i.intersectedStates[0];
 }
 
-function isCompletelyIntersected(i) {
+export function isCompletelyIntersected(i) {
   return i.intersectedStates.length - 1 === i.production.rhs.length;
 }
 
-function spansAcceptingPath(i, fsa) {
+export function spansAcceptingPath(i, fsa) {
   return fsa.initialStates.has(getFirstIntersectedState(i)) && fsa.acceptingStates.has(getLastIntersectedState(i));
-}
+};
 
-function toProduction(i, cfg) {
+export function toProduction(i, cfg) {
   const lhs = `${i.production.lhs}_${getFirstIntersectedState(i)},${getLastIntersectedState(i)}`;
   const rhs = i.production.rhs.map(
     (symbol, index) => cfg.terminals.has(symbol)
@@ -37,14 +37,4 @@ function toProduction(i, cfg) {
       : `${symbol}_${i.intersectedStates[index]},${i.intersectedStates[index + 1]}`
   );
   return production(lhs, rhs);
-}
-
-module.exports = {
-  item,
-  getNextUnprocessedSymbol,
-  getLastIntersectedState,
-  getFirstIntersectedState,
-  isCompletelyIntersected,
-  spansAcceptingPath,
-  toProduction
 };

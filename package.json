@@ -4,8 +4,19 @@
   "description": "Implementation of earley-intersection, following the notes published by Wilker Aziz in 2017. Earley intersection takes as its parameters (1) a context-free grammar (CFG) and (2) a finite automata (FSA) to produce a CFG. The language of the output grammar is the intersection of the languages of the inputs. The closure property was published by Bar-Hillel in 1961.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava"
   },
   "author": "Ryan Prince",
-  "license": "MIT"
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "fsa": "./fsa.mjs",
+      "cfg": "./cfg.mjs",
+      "inersection": "./earley-intersection.mjs"
+    }
+  },
+  "devDependencies": {
+    "ava": "^5.1.1"
+  }
 }
