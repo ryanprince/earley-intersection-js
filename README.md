@@ -1,4 +1,7 @@
-# earley-intersection-js
+# earley-intersection
+
+⚠️👷🏻‍♂️ Changes are underway for the 1.0.0 release.
+
 
 A JavaScript implementation of Earley intersection, based on Doctor Wilker Aziz's notes[1] from the University of Amsterdam.
 
